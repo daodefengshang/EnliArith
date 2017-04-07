@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="version_button_text_size">30sp</dimen>
+    <dimen name="version_button_bg_size">45dp</dimen>
+    <dimen name="version_button_bg_height">46dp</dimen>
+    <dimen name="recyclerview_item_margin">8dp</dimen>
+    <dimen name="appname_text_size">25sp</dimen>
+    <dimen name="item_text_size">16sp</dimen>
+    <dimen name="recyclerview_text_size">35sp</dimen>
+    <dimen name="recyclerview_corners">16dp</dimen>
+    <dimen name="count_switch_minwidth">75dp</dimen>
+    <dimen name="option_textview_size">20sp</dimen>
+    <dimen name="large_option_size">25sp</dimen>
+    <dimen name="count_recyclerview_width">100dp</dimen>
+    <dimen name="count_recyclerview_height">80dp</dimen>
+    <dimen name="count_textview_horizontal_margin">24dp</dimen>
+    <dimen name="count_textview_size">16sp</dimen>
+    <dimen name="count_text_button_radius">10dp</dimen>
+    <dimen name="count_text_button_padding">6dp</dimen>
+    <dimen name="edit_layout_padding">10dp</dimen>
+    <dimen name="edit_corners">8dp</dimen>
+    <dimen name="edit_textsize">30sp</dimen>
+    <dimen name="small_edit_width">60dp</dimen>
+    <dimen name="large_edit_width">80dp</dimen>
+    <dimen name="edit_height">60dp</dimen>
+    <dimen name="plus_small_next_size">20sp</dimen>
+    <dimen name="init_button_radius">20dp</dimen>
+    <dimen name="drawable_padding">3dp</dimen>
+    <dimen name="text_left_padding">6dp</dimen>
+    <dimen name="large_option_margin_bottom">60dp</dimen>
+    <dimen name="large_option_width">300dp</dimen>
+    <dimen name="large_option_height">70dp</dimen>
+    <dimen name="version_size">16sp</dimen>
+    <dimen name="author_size">18sp</dimen>
+    <dimen name="author_bottom_margin">40dp</dimen>
+</resources>

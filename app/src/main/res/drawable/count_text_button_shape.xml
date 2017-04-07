@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="@dimen/count_text_button_radius"/>
+    <padding android:left="@dimen/count_text_button_padding"
+        android:top="@dimen/count_text_button_padding"
+        android:right="@dimen/count_text_button_padding"
+        android:bottom="@dimen/count_text_button_padding"/>
+</shape>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginBottom="@dimen/count_textview_horizontal_margin">
+    <TextView
+        android:id="@+id/next_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginRight="@dimen/count_textview_horizontal_margin"
+        android:drawableRight="@drawable/ic_right_forward"
+        android:gravity="center_vertical"
+        android:text="@string/next_plus_small"
+        android:textSize="@dimen/plus_small_next_size"
+        android:textColor="@color/orange_color"
+        android:background="@drawable/text_button_selector"/>
+</FrameLayout>

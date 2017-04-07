@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <size android:height="@dimen/version_button_bg_height"
+                android:width="@dimen/version_button_bg_height"/>
+            <solid android:color="@android:color/black"/>
+        </shape>
+    </item>
+    <item android:gravity="top|left">
+        <shape android:shape="oval">
+            <solid android:color="@android:color/white"/>
+            <size android:height="@dimen/version_button_bg_size"
+                android:width="@dimen/version_button_bg_size"/>
+            <padding android:bottom="1dp" android:right="1dp"/>
+        </shape>
+    </item>
+</layer-list>
