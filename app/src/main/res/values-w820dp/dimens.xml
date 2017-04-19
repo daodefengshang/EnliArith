@@ -6,4 +6,5 @@
     <dimen name="count_textview_horizontal_margin">84dp</dimen>
     <dimen name="recyclerview_item_margin">16dp</dimen>
     <dimen name="large_option_width">450dp</dimen>
+    <dimen name="large_edit_width">90dp</dimen>
 </resources>

@@ -45,6 +45,7 @@
                     android:singleLine="true"
                     android:background="@drawable/minus_large_edit_bg"/>
                 <View
+                    android:id="@+id/space_view"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"/>

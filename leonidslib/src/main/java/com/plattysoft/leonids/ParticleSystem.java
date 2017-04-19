@@ -20,12 +20,16 @@ import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -125,7 +129,7 @@ public class ParticleSystem {
      * @param timeToLive The time to live for the particles
      * @param parentViewId The view Id for the parent of the particle system
      */
-    public ParticleSystem(Activity a, int maxParticles, int drawableRedId, long timeToLive, int parentViewId) {
+	public ParticleSystem(Activity a, int maxParticles, int drawableRedId, long timeToLive, int parentViewId) {
         this(a, maxParticles, a.getResources().getDrawable(drawableRedId), timeToLive, parentViewId);
     }
 
@@ -156,11 +160,19 @@ public class ParticleSystem {
 			for (int i=0; i<mMaxParticles; i++) {
 				mParticles.add (new Particle (bitmap));
 			}
-		}
-		else if (drawable instanceof AnimationDrawable) {
+		}else if (drawable instanceof AnimationDrawable) {
 			AnimationDrawable animation = (AnimationDrawable) drawable;
 			for (int i=0; i<mMaxParticles; i++) {
 				mParticles.add (new AnimatedParticle (animation));
+			}
+		}else if (drawable instanceof VectorDrawable) {
+			Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+					drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+			Canvas canvas = new Canvas(bitmap);
+			drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+			drawable.draw(canvas);
+			for (int i=0; i<mMaxParticles; i++) {
+				mParticles.add (new Particle (bitmap));
 			}
 		}
 //		else {
@@ -612,7 +624,7 @@ public class ParticleSystem {
 	}
 
 	private void activateParticle(long delay) {
-		Particle p = mParticles.remove(0);	
+		Particle p = mParticles.remove(0);
 		p.init();
 		// Initialization goes before configuration, scale is required before can be configured properly
 		for (int i=0; i<mInitializers.size(); i++) {

@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -15,8 +14,8 @@ import android.widget.TextView;
 
 import com.plattysoft.leonids.ParticleSystem;
 import com.szh.enliarith.R;
-import com.szh.enliarith.customview.AnimImageView;
 import com.szh.enliarith.utils.DensityUtil;
+import com.szh.enliarith.utils.InflateUtil;
 import com.szh.enliarith.utils.ToastUtil;
 
 import java.io.InputStream;
@@ -66,7 +65,6 @@ public class MinusSmallActivity extends BaseActivity implements View.OnClickList
     private float leftTextViewX;
     private int leftTextViewWidth;
 
-    private AnimImageView animImageView;
     private int once = 0;
     private int tmpOnce = 0;
     private List<ImageView> firstList = new ArrayList<>();
@@ -97,7 +95,6 @@ public class MinusSmallActivity extends BaseActivity implements View.OnClickList
         animBase = findViewById(R.id.anim_base);
         animView.post(animRegionRunnable);
         animBase.post(animBaseRunnable);
-        animImageView = (AnimImageView) LayoutInflater.from(this).inflate(R.layout.anim_imageview, null);
     }
 
     @Override
@@ -186,12 +183,10 @@ public class MinusSmallActivity extends BaseActivity implements View.OnClickList
             case 0:
                 leftTextView.setText("");
                 minus1Integer = Integer.parseInt(minus1EditText.getText().toString());
-                animImageView.setImageResource(R.drawable.ic_blue_object);
                 firstAnimator();
                 break;
             case 1:
                 minus2Integer = Integer.parseInt(minus2EditText.getText().toString());
-                animImageView.setImageResource(R.drawable.ic_minus_left_forward);
                 secondAnimator();
                 break;
             case 2:
@@ -216,12 +211,13 @@ public class MinusSmallActivity extends BaseActivity implements View.OnClickList
 
     private void firstAnimator() {
         try {
-            AnimImageView clone = (AnimImageView) animImageView.clone();
-            animView.addView(clone);
-            firstList.add(clone);
-            clone.setTranslationX(minus1EditTextX + minus1EditTextWidth / 2 - DensityUtil.dip2px(this, 12));
-            clone.setTranslationY(animBaseHeight / 2);
-            clone.animate()
+            ImageView animImageView = InflateUtil.getImageView(this);
+            animImageView.setImageResource(R.drawable.ic_blue_object);
+            animView.addView(animImageView);
+            firstList.add(animImageView);
+            animImageView.setTranslationX(minus1EditTextX + minus1EditTextWidth / 2 - DensityUtil.dip2px(this, 12));
+            animImageView.setTranslationY(animBaseHeight / 2);
+            animImageView.animate()
                     .translationY(animBaseHeight + tmpOnce * everyHeight)
                     .setDuration(250 + tmpOnce * 10)
                     .setListener(new Animator.AnimatorListener() {
@@ -247,19 +243,20 @@ public class MinusSmallActivity extends BaseActivity implements View.OnClickList
 
                 }
             }).start();
-        } catch (CloneNotSupportedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void secondAnimator() {
         try {
-            AnimImageView clone = (AnimImageView) animImageView.clone();
-            animView.addView(clone);
-            secondList.add(clone);
-            clone.setTranslationX(minus2EditTextX + minus2EditTextWidth / 2 - DensityUtil.dip2px(this, 12));
-            clone.setTranslationY(animBaseHeight / 2);
-            clone.animate()
+            ImageView animImageView = InflateUtil.getImageView(this);
+            animImageView.setImageResource(R.drawable.ic_minus_left_forward);
+            animView.addView(animImageView);
+            secondList.add(animImageView);
+            animImageView.setTranslationX(minus2EditTextX + minus2EditTextWidth / 2 - DensityUtil.dip2px(this, 12));
+            animImageView.setTranslationY(animBaseHeight / 2);
+            animImageView.animate()
                     .translationY(animBaseHeight + tmpOnce * everyHeight)
                     .setDuration(250 + tmpOnce * 10)
                     .setListener(new Animator.AnimatorListener() {
@@ -285,14 +282,14 @@ public class MinusSmallActivity extends BaseActivity implements View.OnClickList
 
                 }
             }).start();
-        } catch (CloneNotSupportedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void thirdAnimator() {
         try {
-            final ImageView clone = firstList.get(tmpOnce);
+            final ImageView animImageView = firstList.get(tmpOnce);
             float translationX;
             long duration;
             if (tmpOnce < secondList.size()) {
@@ -302,7 +299,7 @@ public class MinusSmallActivity extends BaseActivity implements View.OnClickList
                 translationX = leftTextViewX + leftTextViewWidth / 2 - DensityUtil.dip2px(this, 12);
                 duration = 250;
             }
-            clone.animate()
+            animImageView.animate()
                     .translationX(translationX)
                     .setDuration(duration)
                     .setListener(new Animator.AnimatorListener() {
@@ -320,13 +317,13 @@ public class MinusSmallActivity extends BaseActivity implements View.OnClickList
                         ps1.setSpeedRange(DensityUtil.px2dip(getApplicationContext(), 0.05f), DensityUtil.px2dip(getApplicationContext(), 0.36f));
                         ps1.setRotationSpeedRange(90, 180);
                         ps1.setFadeOut(100, new AccelerateInterpolator());
-                        ps1.oneShot(clone, 40);
+                        ps1.oneShot(animImageView, 40);
                         ParticleSystem ps2 = new ParticleSystem(MinusSmallActivity.this, 60, R.drawable.ic_minus_left_forward, 200);
                         ps2.setScaleRange(DensityUtil.px2dip(getApplicationContext(), 0.3f), DensityUtil.px2dip(getApplicationContext(), 1.5f));
                         ps2.setSpeedRange(DensityUtil.px2dip(getApplicationContext(), 0.05f), DensityUtil.px2dip(getApplicationContext(), 0.48f));
                         ps2.setRotationSpeedRange(90, 180);
                         ps2.setFadeOut(100, new AccelerateInterpolator());
-                        ps2.oneShot(clone, 40);
+                        ps2.oneShot(animImageView, 40);
                     }
                     if (++tmpOnce < firstList.size()) {
                         thirdAnimator();
@@ -351,8 +348,8 @@ public class MinusSmallActivity extends BaseActivity implements View.OnClickList
 
     private void fourthAnimator() {
         try {
-            final ImageView clone = firstList.get(tmpOnce + secondList.size());
-            clone.animate()
+            final ImageView animImageView = firstList.get(tmpOnce + secondList.size());
+            animImageView.animate()
                     .translationY(animBaseHeight / 2)
                     .setDuration(250 + (tmpOnce + secondList.size()) * 10)
                     .setListener(new Animator.AnimatorListener() {
@@ -362,7 +359,7 @@ public class MinusSmallActivity extends BaseActivity implements View.OnClickList
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            animView.removeView(clone);
+                            animView.removeView(animImageView);
                             leftTextView.setText(String.valueOf(tmpOnce + 1));
                             if (++tmpOnce + secondList.size() < firstList.size()) {
                                 fourthAnimator();

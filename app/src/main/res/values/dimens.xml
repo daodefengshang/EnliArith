@@ -22,9 +22,9 @@
     <dimen name="count_text_button_padding">6dp</dimen>
     <dimen name="edit_layout_padding">10dp</dimen>
     <dimen name="edit_corners">8dp</dimen>
-    <dimen name="edit_textsize">30sp</dimen>
+    <dimen name="edit_textsize">25sp</dimen>
     <dimen name="small_edit_width">60dp</dimen>
-    <dimen name="large_edit_width">80dp</dimen>
+    <dimen name="large_edit_width">66dp</dimen>
     <dimen name="edit_height">60dp</dimen>
     <dimen name="plus_small_next_size">20sp</dimen>
     <dimen name="init_button_radius">20dp</dimen>

@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.os.Build;
 import android.util.AttributeSet;
