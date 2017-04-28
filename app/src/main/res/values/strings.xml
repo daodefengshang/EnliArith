@@ -24,4 +24,7 @@
 
     <string name="large_plus1_error">请输入1～9998的整数</string>
     <string name="large_minus1_error">请输入1～9999的整数</string>
+
+    <string name="abacus_init">初始化</string>
+    <string name="abacus_sure">确定</string>
 </resources>

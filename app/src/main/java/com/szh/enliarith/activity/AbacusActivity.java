@@ -1,52 +1,34 @@
 package com.szh.enliarith.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.animation.AnimatorCompatHelper;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.util.Property;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.szh.enliarith.R;
+import com.szh.enliarith.listener.ShakeListener;
 import com.szh.enliarith.utils.ChildViewHelper;
 import com.szh.enliarith.utils.DensityUtil;
-import com.szh.enliarith.utils.ToastUtil;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
- * Created by szh on 2017/4/26.
+ * Created by szh on 2017/4/26.珠算
  */
-public class AbacusActivity extends AppCompatActivity {
+public class AbacusActivity extends AppCompatActivity implements ShakeListener.OnShakeListener {
 
     private final Handler mHideHandler = new Handler();
 
     private final Runnable mHidePart2Runnable = new Runnable() {
-        @SuppressLint("InlinedApi")
         @Override
         public void run() {
-            view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+            fullScreen();
             mHideHandler.postDelayed(mBorderAndSetBeadRunnable, 200);
         }
     };
@@ -57,9 +39,7 @@ public class AbacusActivity extends AppCompatActivity {
             getBorderAndSetBead(view.getWidth(), view.getHeight());
         }
     };
-
     private void getBorderAndSetBead(int width, int height) {
-        float bitmapWidth, bitmapHeight;
         if (width * 364 < height * 756) {
             bitmapWidth = width;
             bitmapHeight = width * 364f / 756;
@@ -67,7 +47,7 @@ public class AbacusActivity extends AppCompatActivity {
             bitmapWidth = height * 756f / 364;
             bitmapHeight = height;
         }
-        float beadWidth = bitmapWidth * 50 / 756;
+        beadWidth = bitmapWidth * 50 / 756;
         beadHeight = beadWidth * 41 / 79;
         yBorders[0] = (height - bitmapHeight) / 2 + bitmapHeight * 17 / 364 - 1;
         yBorders[1] = (height - bitmapHeight) / 2 + bitmapHeight * 118 / 364 - (beadHeight - 1);
@@ -86,9 +66,19 @@ public class AbacusActivity extends AppCompatActivity {
                 imageView.setTranslationY(yBorders[3] - (6 - i % 7) * (beadHeight - 1));
             }
         }
+        if (shakeListener != null) {
+            shakeListener.setOnShakeListener(this);
+        }
     }
 
+    private ShakeListener shakeListener;
+
     private float[] yBorders = new float[4];
+
+    private float bitmapWidth;
+    private float bitmapHeight;
+
+    private float beadWidth;
     private float beadHeight;
     private View view;
     private FrameLayout beadView;
@@ -100,6 +90,7 @@ public class AbacusActivity extends AppCompatActivity {
         setContentView(R.layout.activity_abacus);
         view = findViewById(R.id.image_view);
         beadView = (FrameLayout) findViewById(R.id.frame_bead);
+        shakeListener = new ShakeListener(this);
         hide();
         gestureDetector = new GestureDetector(this, new OnGestureListener());
         beadView.setOnTouchListener(new View.OnTouchListener() {
@@ -115,7 +106,50 @@ public class AbacusActivity extends AppCompatActivity {
         mHideHandler.post(mHidePart2Runnable);
     }
 
+    @Override
+    public void onShake() {
+        resumeBeads();
+    }
 
+    private void resumeBeads() {
+        int childCount = beadView.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View imageView = beadView.getChildAt(i);
+            imageView.setTranslationX((i / 7 * 53.75f + 57) * bitmapWidth / 756 - beadWidth / 2 + (view.getWidth() - bitmapWidth) / 2);
+            if (i % 7 < 2) {
+                imageView.setTranslationY(yBorders[0] + (i % 7) * (beadHeight - 1));
+            } else {
+                imageView.setTranslationY(yBorders[3] - (6 - i % 7) * (beadHeight - 1));
+            }
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    private void fullScreen() {
+        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fullScreen();
+        if (shakeListener != null) {
+            shakeListener.start();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (shakeListener != null) {
+            shakeListener.stop();
+        }
+    }
 
     private class OnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
@@ -130,6 +164,19 @@ public class AbacusActivity extends AppCompatActivity {
                 translationY =  view.getTranslationY();
             }
             return false;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            if (childViewIndex == -1) {
+                Snackbar.make(beadView, R.string.abacus_init, Snackbar.LENGTH_SHORT)
+                        .setAction(R.string.abacus_sure, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                resumeBeads();
+                            }
+                        }).show();
+            }
         }
 
         @Override
