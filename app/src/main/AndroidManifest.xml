@@ -47,6 +47,12 @@
             android:name="com.szh.enliarith.activity.MinusLargeActivity"
             android:label="@string/minus_large_name"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.szh.enliarith.activity.AbacusActivity"
+            android:theme="@style/FullscreenTheme"
+            android:label="@string/abacus_name"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="landscape" />
     </application>
 
 </manifest>

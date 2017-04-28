@@ -6,17 +6,13 @@
     <string name="minus_small_name">20以内的减法</string>
     <string name="plus_large_name">10000以内的加法</string>
     <string name="minus_large_name">10000以内的减法</string>
+    <string name="abacus_name">珠算</string>
     <string name="exit_string">再按一次退出</string>
-    <string name="count">从1数到100</string>
-    <string name="plus_small">20以内的加法</string>
-    <string name="minus_small">20以内的减法</string>
-    <string name="plus_large">10000以内的加法</string>
     <string name="count_option">
             小贴士:\n
                 &#160;前一个数 = 当前数 - 1\n
                 &#160;后一个数 = 当前数 + 1
     </string>
-    <string name="minus_large">10000以内的减法</string>
 
     <string name="author">QQ:1107637961</string>
     <string name="minus_count">倒着数</string>

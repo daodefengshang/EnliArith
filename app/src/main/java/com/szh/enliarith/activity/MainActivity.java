@@ -41,21 +41,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ((GridLayoutManager) layoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
-                    return position == 0 ? 2 : 1;
+                    return position == 0 || position == 5 ? 2 : 1;
                 }
             });
         }
         recyclerView.setHasFixedSize(true);
-        int[] counts = {R.drawable.count, R.string.count};
-        int[] plusSmall = {R.drawable.plus_small,  R.string.plus_small};
-        int[] minusSmall = {R.drawable.minus_small, R.string.minus_small};
-        int[] plusLarge = {R.drawable.plus_large, R.string.plus_large};
-        int[] minusLarge = {R.drawable.minus_large, R.string.minus_large};
+        int[] counts = {R.drawable.count, R.string.count_name};
+        int[] plusSmall = {R.drawable.plus_small,  R.string.plus_small_name};
+        int[] minusSmall = {R.drawable.minus_small, R.string.minus_small_name};
+        int[] plusLarge = {R.drawable.plus_large, R.string.plus_large_name};
+        int[] minusLarge = {R.drawable.minus_large, R.string.minus_large_name};
+        int[] abacus = {R.drawable.abacus_thumb, R.string.abacus_name};
         list.add(counts);
         list.add(plusSmall);
         list.add(minusSmall);
         list.add(plusLarge);
         list.add(minusLarge);
+        list.add(abacus);
         MainRecyclerViewAdapter mainRecyclerViewAdapter = new MainRecyclerViewAdapter(this, list);
         recyclerView.setAdapter(mainRecyclerViewAdapter);
     }
@@ -88,6 +90,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case 4:
                 startActivity(new Intent(MainActivity.this, MinusLargeActivity.class));
+                break;
+            case 5:
+                startActivity(new Intent(MainActivity.this, AbacusActivity.class));
                 break;
         }
         overridePendingTransition(R.anim.anim_enter, R.anim.anim_exit);

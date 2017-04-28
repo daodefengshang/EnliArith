@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.szh.enliarith.utils.DensityUtil;
+import com.szh.enliarith.utils.StatusBarUtil;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class ShowGestureView extends View {
                 invalidate();
             }
             if (!flag) {
-                postDelayed(removeRunnable, 40);
+                postDelayed(removeRunnable, 30);
             }
         }
     };
@@ -66,7 +67,7 @@ public class ShowGestureView extends View {
 
     private void init() {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        statusBarHeight = getStatusBarHeight();
+        statusBarHeight = StatusBarUtil.getStatusBarHeight(getContext());
         paint = new Paint();
         paint.setColor(Color.BLUE);
         paint.setAntiAlias(true);
@@ -97,22 +98,5 @@ public class ShowGestureView extends View {
             list.remove(18);
         }
         invalidate();
-    }
-
-    private int getStatusBarHeight() {
-        Class<?> c = null;
-        Object obj = null;
-        Field field = null;
-        int x = 0, sbar = 0;
-        try {
-            c = Class.forName("com.android.internal.R$dimen");
-            obj = c.newInstance();
-            field = c.getField("status_bar_height");
-            x = Integer.parseInt(field.get(obj).toString());
-            sbar = getContext().getResources().getDimensionPixelSize(x);
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-        return sbar;
     }
 }
