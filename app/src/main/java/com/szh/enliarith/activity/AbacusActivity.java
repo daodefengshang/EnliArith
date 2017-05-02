@@ -1,6 +1,8 @@
 package com.szh.enliarith.activity;
 
 import android.annotation.SuppressLint;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -17,6 +19,10 @@ import com.szh.enliarith.R;
 import com.szh.enliarith.listener.ShakeListener;
 import com.szh.enliarith.utils.ChildViewHelper;
 import com.szh.enliarith.utils.DensityUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by szh on 2017/4/26.珠算
@@ -39,6 +45,9 @@ public class AbacusActivity extends AppCompatActivity implements ShakeListener.O
             getBorderAndSetBead(view.getWidth(), view.getHeight());
         }
     };
+    private SoundPool soundPool;
+    private Map<Integer, Integer> soundMap;
+
     private void getBorderAndSetBead(int width, int height) {
         if (width * 364 < height * 756) {
             bitmapWidth = width;
@@ -90,6 +99,11 @@ public class AbacusActivity extends AppCompatActivity implements ShakeListener.O
         setContentView(R.layout.activity_abacus);
         view = findViewById(R.id.image_view);
         beadView = (FrameLayout) findViewById(R.id.frame_bead);
+        //noinspection deprecation
+        soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
+        soundMap = new HashMap<>();
+        soundMap.put(0, soundPool.load(this, R.raw.bead01, 1));
+        soundMap.put(1, soundPool.load(this, R.raw.bead02, 1));
         shakeListener = new ShakeListener(this);
         hide();
         gestureDetector = new GestureDetector(this, new OnGestureListener());
@@ -108,6 +122,8 @@ public class AbacusActivity extends AppCompatActivity implements ShakeListener.O
 
     @Override
     public void onShake() {
+        soundPool.play(soundMap.get(0), 1.0f, 1.0f, 1, 0, 1.5f);
+        soundPool.play(soundMap.get(1), 1.0f, 1.0f, 1, 0, 1.5f);
         resumeBeads();
     }
 
@@ -149,6 +165,13 @@ public class AbacusActivity extends AppCompatActivity implements ShakeListener.O
         if (shakeListener != null) {
             shakeListener.stop();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        soundMap.clear();
+        soundPool.release();
     }
 
     private class OnGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -281,6 +304,18 @@ public class AbacusActivity extends AppCompatActivity implements ShakeListener.O
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             if (childViewIndex != -1 || DensityUtil.px2dip(AbacusActivity.this, Math.abs(velocityY)) > 1000000) {
                 View view = beadView.getChildAt(childViewIndex);
+                float locationY0, locationY1;
+                if (childViewIndex % 7 < 2) {
+                    locationY0 = yBorders[0] + (childViewIndex % 7) * (beadHeight - 1);
+                    locationY1 = yBorders[1] - (1 - childViewIndex % 7) * (beadHeight - 1);
+                } else {
+                    locationY0 = yBorders[3] - (6 - childViewIndex % 7) * (beadHeight - 1);
+                    locationY1 = yBorders[2] + (childViewIndex % 7 - 2) * (beadHeight - 1);
+                }
+                if (Math.abs(view.getTranslationY() - locationY0) > 1
+                        && Math.abs(view.getTranslationY() - locationY1) > 1) {
+                    soundPool.play(soundMap.get(1), 1.0f, 1.0f, 1, 0, 1.5f);
+                }
                 try {
                     switch (childViewIndex % 7) {
                         case 0:
