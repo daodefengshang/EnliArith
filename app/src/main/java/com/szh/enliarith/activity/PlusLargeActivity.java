@@ -15,6 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -39,6 +40,9 @@ public class PlusLargeActivity extends BaseActivity
     private EditText plus1EditText;
     private EditText plus2EditText;
     private TextView sumTextView;
+    private FrameLayout sumFrame;
+    private float sumFrameX;
+    private EditText result;
 
     private Runnable animRegionRunnable = new Runnable() {
         @Override
@@ -58,6 +62,7 @@ public class PlusLargeActivity extends BaseActivity
             plus1EditTextWidth = plus1EditText.getWidth();
             plus2EditTextX = plus2EditText.getX();
             plus2EditTextWidth = plus2EditText.getWidth();
+            sumFrameX = sumFrame.getX();
             sumTextViewX = sumTextView.getX();
             sumTextViewWidth = sumTextView.getWidth();
         }
@@ -108,6 +113,8 @@ public class PlusLargeActivity extends BaseActivity
         plus1EditText = (EditText) findViewById(R.id.plus1);
         plus2EditText = (EditText) findViewById(R.id.plus2);
         sumTextView = (TextView) findViewById(R.id.sum);
+        sumFrame = (FrameLayout) findViewById(R.id.sum_frame);
+        result = (EditText) findViewById(R.id.result);
         animView = (RelativeLayout) findViewById(R.id.anim_view);
         animBase = findViewById(R.id.anim_base);
         spaceView = findViewById(R.id.space_view);
@@ -128,6 +135,7 @@ public class PlusLargeActivity extends BaseActivity
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
+            result.setText("");
             sumTextView.setText("");
         }
     }
@@ -138,6 +146,7 @@ public class PlusLargeActivity extends BaseActivity
             case R.id.plus_large_container:
                 plus1EditText.clearFocus();
                 plus2EditText.clearFocus();
+                result.clearFocus();
                 hideSoftInputFromWindow(view);
                 return true;
             case R.id.anim_base:
@@ -153,6 +162,7 @@ public class PlusLargeActivity extends BaseActivity
         int plus1Num = random.nextInt(9998) + 1;
         plus1EditText.setText(String.valueOf(plus1Num));
         plus2EditText.setText(String.valueOf(random.nextInt(9999 - plus1Num) + 1));
+        result.setText("");
         sumTextView.setText("");
     }
 
@@ -192,8 +202,10 @@ public class PlusLargeActivity extends BaseActivity
     private void runAnimator() {
         plus1EditText.clearFocus();
         plus2EditText.clearFocus();
+        result.clearFocus();
         plus1EditText.setEnabled(false);
         plus2EditText.setEnabled(false);
+        result.setEnabled(false);
         setNextClickable(false);
         setRefreshClickable(false);
         animBase.setEnabled(false);
@@ -215,6 +227,7 @@ public class PlusLargeActivity extends BaseActivity
                 once = 0;
                 plus1EditText.setEnabled(true);
                 plus2EditText.setEnabled(true);
+                result.setEnabled(true);
                 setNextClickable(true);
                 setRefreshClickable(true);
                 animBase.setEnabled(true);
@@ -235,7 +248,7 @@ public class PlusLargeActivity extends BaseActivity
                 animTextView.setTranslationY(animBaseHeight / 2);
                 final int finalI = i;
                 animTextView.animate()
-                        .translationX(sumTextViewX - (length - i - 1) * (animBaseWidth * 1.0f - sumTextViewWidth * 2 - spaceViewWidth * 4) / 4)
+                        .translationX(sumFrameX + sumTextViewX - (length - i - 1) * (animBaseWidth * 1.0f - sumTextViewWidth * 2 - spaceViewWidth * 4) / 4)
                         .translationY(animBaseHeight + DensityUtil.sp2px(this, TEXTSIZE + 20))
                         .setDuration(300)
                         .setListener(new Animator.AnimatorListener() {
@@ -278,7 +291,7 @@ public class PlusLargeActivity extends BaseActivity
                 animTextView.setTranslationX(plus2EditTextX + plus2EditTextWidth / 2 - DensityUtil.sp2px(this, TEXTSIZE - 20));
                 animTextView.setTranslationY(animBaseHeight / 2);
                 animTextView.animate()
-                        .translationX(sumTextViewX - (length - i - 1) * (animBaseWidth * 1.0f - sumTextViewWidth * 2 - spaceViewWidth * 4) / 4)
+                        .translationX(sumFrameX + sumTextViewX - (length - i - 1) * (animBaseWidth * 1.0f - sumTextViewWidth * 2 - spaceViewWidth * 4) / 4)
                         .translationY(animBaseHeight + DensityUtil.sp2px(this, TEXTSIZE * 2 + 40))
                         .setDuration(300)
                         .setListener(new Animator.AnimatorListener() {
@@ -471,7 +484,7 @@ public class PlusLargeActivity extends BaseActivity
             animTextView.setAlpha(0.01f);
             animTextView.setVisibility(View.INVISIBLE);
             animView.addView(animTextView);
-            animTextView.setTranslationX(sumTextViewX - (once - 1) * (animBaseWidth * 1.0f - sumTextViewWidth * 2 - spaceViewWidth * 4) / 4);
+            animTextView.setTranslationX(sumFrameX + sumTextViewX - (once - 1) * (animBaseWidth * 1.0f - sumTextViewWidth * 2 - spaceViewWidth * 4) / 4);
             animTextView.setTranslationY(animBaseHeight + DensityUtil.sp2px(this, TEXTSIZE * 4 + 70));
             if (animTextViewTmp != null) {
                 animTextViewTmp.setScaleX(0.01f);
@@ -479,7 +492,7 @@ public class PlusLargeActivity extends BaseActivity
                 animTextViewTmp.setAlpha(0.01f);
                 animTextViewTmp.setVisibility(View.INVISIBLE);
                 animView.addView(animTextViewTmp);
-                animTextViewTmp.setTranslationX(sumTextViewX - (once - 1) * (animBaseWidth * 1.0f - sumTextViewWidth * 2 - spaceViewWidth * 2) / 4
+                animTextViewTmp.setTranslationX(sumFrameX + sumTextViewX - (once - 1) * (animBaseWidth * 1.0f - sumTextViewWidth * 2 - spaceViewWidth * 2) / 4
                         - DensityUtil.sp2px(this, TEXTSIZE / 2));
                 animTextViewTmp.setTranslationY(animBaseHeight + DensityUtil.sp2px(this, TEXTSIZE * 4 + 70));
                 final TextView finalTextViewTmp = animTextViewTmp;
@@ -546,7 +559,7 @@ public class PlusLargeActivity extends BaseActivity
 
     private void secondNextSecondAnimator() {
         sixthList.get(once).animate().scaleX(0.6f).scaleY(0.6f)
-                .translationX(sumTextViewX - once * (animBaseWidth * 1.0f - sumTextViewWidth * 2 - spaceViewWidth * 4) / 4
+                .translationX(sumFrameX + sumTextViewX - once * (animBaseWidth * 1.0f - sumTextViewWidth * 2 - spaceViewWidth * 4) / 4
                         + DensityUtil.sp2px(this, TEXTSIZE - 22))
                 .translationY(animBaseHeight + DensityUtil.sp2px(this, TEXTSIZE * 3 + 50))
                 .setDuration(200)
@@ -585,7 +598,7 @@ public class PlusLargeActivity extends BaseActivity
         final int[] m = {0, 0};
         for (final TextView animTextView : fifthList) {
             animTextView.animate().alpha(0.1f)
-                    .translationX(sumTextViewX + sumTextViewWidth / 2 - DensityUtil.sp2px(this, TEXTSIZE - 20))
+                    .translationX(sumFrameX + sumTextViewX + sumTextViewWidth / 2 - DensityUtil.sp2px(this, TEXTSIZE - 20))
                     .translationY(animBaseHeight / 2)
                     .setDuration(400)
                     .setInterpolator(new DecelerateInterpolator())
@@ -737,12 +750,14 @@ public class PlusLargeActivity extends BaseActivity
                             animView.removeView(animTextView);
                             m[1]++;
                             if (m[0] == m[1]) {
+                                showResult();
                                 firstList.clear();
                                 once = 0;
                                 setNextClickable(true);
                                 setRefreshClickable(true);
                                 plus1EditText.setEnabled(true);
                                 plus2EditText.setEnabled(true);
+                                result.setEnabled(true);
                                 animBase.setEnabled(true);
                                 dismissOption();
                             }
@@ -758,6 +773,18 @@ public class PlusLargeActivity extends BaseActivity
 
                         }
                     }).start();
+        }
+    }
+
+    private void showResult() {
+        Editable resultText = result.getText();
+        if (TextUtils.isEmpty(resultText)) {
+            return;
+        }
+        if (Integer.parseInt(resultText.toString()) == Integer.parseInt(sumTextView.getText().toString())) {
+            showCorrectView();
+        } else {
+            showErrorView();
         }
     }
 
@@ -780,6 +807,9 @@ public class PlusLargeActivity extends BaseActivity
         plus2EditText.setText("");
         plus2EditText.clearFocus();
         plus2EditText.clearComposingText();
+        result.setText("");
+        result.clearFocus();
+        result.clearComposingText();
     }
 
     @Override
@@ -791,6 +821,7 @@ public class PlusLargeActivity extends BaseActivity
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         plus1EditText.setText("");
         plus2EditText.setText("");
+        result.setText("");
         sumTextView.setText("");
         return false;
     }

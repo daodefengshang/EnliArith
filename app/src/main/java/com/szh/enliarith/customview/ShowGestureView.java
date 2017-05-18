@@ -34,10 +34,15 @@ public class ShowGestureView extends View {
                 invalidate();
             }
             if (!flag) {
-                postDelayed(removeRunnable, 30);
+                removePoint();
             }
         }
     };
+
+    private void removePoint() {
+        postDelayed(removeRunnable, 30);
+    }
+
     private Paint paint;
     private int statusBarHeight;
 

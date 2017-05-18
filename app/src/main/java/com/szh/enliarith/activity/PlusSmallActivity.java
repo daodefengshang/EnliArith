@@ -3,10 +3,12 @@ package com.szh.enliarith.activity;
 import android.animation.Animator;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -45,6 +47,7 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
             plus1EditTextWidth = plus1EditText.getWidth();
             plus2EditTextX = plus2EditText.getX();
             plus2EditTextWidth = plus2EditText.getWidth();
+            sumFrameX = sumFrame.getX();
             sumTextViewX = sumTextView.getX();
             sumTextViewWidth = sumTextView.getWidth();
         }
@@ -69,6 +72,9 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
     private List<ImageView> secondList = new ArrayList<>();
     private int plus1Integer;
     private int plus2Integer;
+    private FrameLayout sumFrame;
+    private float sumFrameX;
+    private EditText result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +95,8 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
         plus1EditText = (EditText) findViewById(R.id.plus1);
         plus2EditText = (EditText) findViewById(R.id.plus2);
         sumTextView = (TextView) findViewById(R.id.sum);
+        sumFrame = (FrameLayout) findViewById(R.id.sum_frame);
+        result = (EditText) findViewById(R.id.result);
         animView = (RelativeLayout) findViewById(R.id.anim_view);
         animBase = findViewById(R.id.anim_base);
         animView.post(animRegionRunnable);
@@ -107,6 +115,7 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
+            result.setText("");
             sumTextView.setText("");
         }
     }
@@ -117,6 +126,7 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
             case R.id.plus_small_container:
                 plus1EditText.clearFocus();
                 plus2EditText.clearFocus();
+                result.clearFocus();
                 hideSoftInputFromWindow(view);
                 return true;
             case R.id.anim_base:
@@ -132,6 +142,7 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
         int plus1Num = random.nextInt(19) + 1;
         plus1EditText.setText(String.valueOf(plus1Num));
         plus2EditText.setText(String.valueOf(random.nextInt(20 - plus1Num) + 1));
+        result.setText("");
         sumTextView.setText("");
     }
 
@@ -172,8 +183,10 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
         tmpOnce = 0;
         plus1EditText.clearFocus();
         plus2EditText.clearFocus();
+        result.clearFocus();
         plus1EditText.setEnabled(false);
         plus2EditText.setEnabled(false);
+        result.setEnabled(false);
         setNextClickable(false);
         setRefreshClickable(false);
         animBase.setEnabled(false);
@@ -199,6 +212,7 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
                 once = 0;
                 plus1EditText.setEnabled(true);
                 plus2EditText.setEnabled(true);
+                result.setEnabled(true);
                 setNextClickable(true);
                 setRefreshClickable(true);
                 animBase.setEnabled(true);
@@ -297,7 +311,7 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
                 duration = 250;
             }
             animImageView.animate()
-                    .translationX(sumTextViewX + sumTextViewWidth / 2 - DensityUtil.dip2px(this, 12))
+                    .translationX(sumFrameX + sumTextViewX + sumTextViewWidth / 2 - DensityUtil.dip2px(this, 12))
                     .setDuration(duration)
                     .setListener(new Animator.AnimatorListener() {
                 @Override
@@ -350,12 +364,14 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
                             if (++tmpOnce < firstList.size() + secondList.size()) {
                                 fourthAnimator();
                             } else {
+                                showResult();
                                 firstList.clear();
                                 secondList.clear();
                                 setNextClickable(true);
                                 setRefreshClickable(true);
                                 plus1EditText.setEnabled(true);
                                 plus2EditText.setEnabled(true);
+                                result.setEnabled(true);
                                 animBase.setEnabled(true);
                             }
                         }
@@ -374,6 +390,18 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
+    private void showResult() {
+        Editable resultText = result.getText();
+        if (TextUtils.isEmpty(resultText)) {
+            return;
+        }
+        if (Integer.parseInt(resultText.toString()) == Integer.parseInt(sumTextView.getText().toString())) {
+            showCorrectView();
+        } else {
+            showErrorView();
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -389,6 +417,9 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
         plus2EditText.setText("");
         plus2EditText.clearFocus();
         plus2EditText.clearComposingText();
+        result.setText("");
+        result.clearFocus();
+        result.clearComposingText();
     }
 
     @Override
@@ -400,6 +431,7 @@ public class PlusSmallActivity extends BaseActivity implements View.OnClickListe
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         plus1EditText.setText("");
         plus2EditText.setText("");
+        result.setText("");
         sumTextView.setText("");
         return false;
     }

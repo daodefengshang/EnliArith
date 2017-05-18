@@ -87,14 +87,34 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"/>
-                <TextView
-                    android:id="@+id/left"
-                    android:layout_width="@dimen/large_edit_width"
-                    android:layout_height="@dimen/edit_height"
-                    android:gravity="center"
-                    android:textSize="@dimen/edit_textsize"
-                    android:textColor="@android:color/black"
-                    android:background="@drawable/minus_large_edit_bg"/>
+                <FrameLayout
+                    android:id="@+id/left_frame"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/left"
+                        android:layout_width="@dimen/large_edit_width"
+                        android:layout_height="@dimen/edit_height"
+                        android:gravity="center"
+                        android:textSize="@dimen/edit_textsize"
+                        android:textColor="@android:color/black"
+                        android:background="@drawable/minus_large_edit_bg"/>
+                    <EditText
+                        android:id="@+id/result"
+                        android:layout_width="@dimen/large_edit_width"
+                        android:layout_height="@dimen/edit_height"
+                        android:gravity="center"
+                        android:cursorVisible="true"
+                        android:textCursorDrawable="@drawable/ic_cursor"
+                        android:textSize="@dimen/edit_textsize"
+                        android:textColor="@android:color/holo_red_light"
+                        android:alpha="0.3"
+                        android:inputType="number"
+                        android:maxLength="4"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:background="@drawable/result_bg"/>
+                </FrameLayout>
                 <View
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -104,5 +124,6 @@
         </RelativeLayout>
         <include layout="@layout/include_previous_next"/>
     </LinearLayout>
+    <include layout="@layout/include_result"/>
     <include layout="@layout/include_showgesture_view"/>
 </merge>

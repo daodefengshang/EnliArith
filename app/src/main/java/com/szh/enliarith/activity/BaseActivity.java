@@ -1,5 +1,6 @@
 package com.szh.enliarith.activity;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.GestureDetector;
@@ -7,6 +8,8 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.szh.enliarith.R;
 import com.szh.enliarith.customview.ShowGestureView;
@@ -21,8 +24,22 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     private View nextView;
 
     private ShowGestureView showGestureView;
+    private TextView correctTextView;
+    private TextView errorTextView;
 
+    private Runnable correctRunnable = new Runnable() {
+        @Override
+        public void run() {
+            correctTextView.setVisibility(View.INVISIBLE);
+        }
+    };
 
+    private Runnable errorRunnable = new Runnable() {
+        @Override
+        public void run() {
+            errorTextView.setVisibility(View.INVISIBLE);
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +55,25 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         nextView = findViewById(R.id.next_textview);
         gestureDetector = new GestureDetector(this, this);
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        correctTextView = (TextView) findViewById(R.id.correct);
+        if (correctTextView != null) {
+            correctTextView.setVisibility(View.INVISIBLE);
+        }
+        errorTextView = (TextView) findViewById(R.id.error);
+        if (errorTextView != null) {
+            errorTextView.setVisibility(View.INVISIBLE);
+        }
         showGestureView = (ShowGestureView) findViewById(R.id.showgesture_view);
+    }
+
+    protected void showCorrectView() {
+        correctTextView.setVisibility(View.VISIBLE);
+        correctTextView.postDelayed(correctRunnable, 2000);
+    }
+
+    protected void showErrorView() {
+        errorTextView.setVisibility(View.VISIBLE);
+        errorTextView.postDelayed(errorRunnable, 2000);
     }
 
     protected void initEvents() {
@@ -94,6 +129,12 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         super.onDestroy();
         if (showGestureView != null) {
             showGestureView.destroyRunnable();
+        }
+        if (correctTextView != null) {
+            correctTextView.removeCallbacks(correctRunnable);
+        }
+        if (errorTextView != null) {
+            errorTextView.removeCallbacks(errorRunnable);
         }
     }
 

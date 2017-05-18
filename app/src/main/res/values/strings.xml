@@ -31,4 +31,7 @@
     <string name="abacus_prompt">提示</string>
     <string name="abacus_revail"><font color="gray">摇一摇初始化算盘需要传感器权限。</font></string>
     <string name="abacus_sound">开启音效</string>
+
+    <string name="correct">回答正确</string>
+    <string name="error">回答错误</string>
 </resources>

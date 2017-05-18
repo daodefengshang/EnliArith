@@ -15,6 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,6 +39,9 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
     private EditText minus1EditText;
     private EditText minus2EditText;
     private TextView leftTextView;
+    private FrameLayout leftFrame;
+    private EditText result;
+    private float leftFrameX;
 
     private Runnable animRegionRunnable = new Runnable() {
         @Override
@@ -57,6 +61,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
             minus1EditTextWidth = minus1EditText.getWidth();
             minus2EditTextX = minus2EditText.getX();
             minus2EditTextWidth = minus2EditText.getWidth();
+            leftFrameX = leftFrame.getX();
             leftTextViewX = leftTextView.getX();
             leftTextViewWidth = leftTextView.getWidth();
         }
@@ -107,6 +112,8 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
         minus1EditText = (EditText) findViewById(R.id.minus1);
         minus2EditText = (EditText) findViewById(R.id.minus2);
         leftTextView = (TextView) findViewById(R.id.left);
+        leftFrame = (FrameLayout) findViewById(R.id.left_frame);
+        result = (EditText) findViewById(R.id.result);
         animView = (RelativeLayout) findViewById(R.id.anim_view);
         animBase = findViewById(R.id.anim_base);
         spaceView = findViewById(R.id.space_view);
@@ -127,6 +134,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
+            result.setText("");
             leftTextView.setText("");
         }
     }
@@ -137,6 +145,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
             case R.id.minus_large_container:
                 minus1EditText.clearFocus();
                 minus2EditText.clearFocus();
+                result.clearFocus();
                 hideSoftInputFromWindow(view);
                 return true;
             case R.id.anim_base:
@@ -152,6 +161,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
         int minus1Num = random.nextInt(9999) + 1;
         minus1EditText.setText(String.valueOf(minus1Num));
         minus2EditText.setText(String.valueOf(random.nextInt(minus1Num) + 1));
+        result.setText("");
         leftTextView.setText("");
     }
 
@@ -191,8 +201,10 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
     private void runAnimator() {
         minus1EditText.clearFocus();
         minus2EditText.clearFocus();
+        result.clearFocus();
         minus1EditText.setEnabled(false);
         minus2EditText.setEnabled(false);
+        result.setEnabled(false);
         setNextClickable(false);
         setRefreshClickable(false);
         animBase.setEnabled(false);
@@ -214,6 +226,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
                 once = 0;
                 minus1EditText.setEnabled(true);
                 minus2EditText.setEnabled(true);
+                result.setEnabled(true);
                 setNextClickable(true);
                 setRefreshClickable(true);
                 animBase.setEnabled(true);
@@ -235,7 +248,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
                 animTextView.setTranslationY(animBaseHeight / 2);
                 final int finalI = i;
                 animTextView.animate()
-                        .translationX(leftTextViewX - (length - i - 1) * (animBaseWidth * 1.0f - leftTextViewWidth * 2 - spaceViewWidth * 4) / 4)
+                        .translationX(leftFrameX + leftTextViewX - (length - i - 1) * (animBaseWidth * 1.0f - leftTextViewWidth * 2 - spaceViewWidth * 4) / 4)
                         .translationY(animBaseHeight + DensityUtil.sp2px(this, TEXTSIZE * 2 + 10))
                         .setDuration(300)
                         .setListener(new Animator.AnimatorListener() {
@@ -279,7 +292,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
                 animTextView.setTranslationX(minus2EditTextX + minus2EditTextWidth / 2 - DensityUtil.sp2px(this, TEXTSIZE - 20));
                 animTextView.setTranslationY(animBaseHeight / 2);
                 animTextView.animate()
-                        .translationX(leftTextViewX - (length - i - 1) * (animBaseWidth * 1.0f - leftTextViewWidth * 2 - spaceViewWidth * 4) / 4)
+                        .translationX(leftFrameX + leftTextViewX - (length - i - 1) * (animBaseWidth * 1.0f - leftTextViewWidth * 2 - spaceViewWidth * 4) / 4)
                         .translationY(animBaseHeight + DensityUtil.sp2px(this, TEXTSIZE * 3 + 30))
                         .setDuration(300)
                         .setListener(new Animator.AnimatorListener() {
@@ -465,6 +478,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
             } else {
                 animTextView.setText(String.valueOf(leftNum + 10));
                 animTextViewTmp = InflateUtil.getShadowTextView(this);
+                animTextViewTmp.setTextColor(0xFF00FF00);
                 animTextViewTmp.setText(String.valueOf(-1));
             }
             fifthList.add(animTextView);
@@ -477,7 +491,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
                 animTextViewTmp.setAlpha(0.01f);
                 animTextViewTmp.setVisibility(View.INVISIBLE);
                 animView.addView(animTextViewTmp);
-                animTextViewTmp.setTranslationX(leftTextViewX - once * (animBaseWidth * 1.0f - leftTextViewWidth * 2 - spaceViewWidth * 4) / 4
+                animTextViewTmp.setTranslationX(leftFrameX + leftTextViewX - once * (animBaseWidth * 1.0f - leftTextViewWidth * 2 - spaceViewWidth * 4) / 4
                         + DensityUtil.sp2px(this, TEXTSIZE - 15));
                 animTextViewTmp.setTranslationY(animBaseHeight + DensityUtil.sp2px(this, TEXTSIZE * 2) - 8);
                 final TextView finalTextViewTmp = animTextViewTmp;
@@ -520,7 +534,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
         animTextView.setAlpha(0.01f);
         animTextView.setVisibility(View.INVISIBLE);
         animView.addView(animTextView);
-        animTextView.setTranslationX(leftTextViewX - (once - 1) * (animBaseWidth * 1.0f - leftTextViewWidth * 2 - spaceViewWidth * 4) / 4);
+        animTextView.setTranslationX(leftFrameX + leftTextViewX - (once - 1) * (animBaseWidth * 1.0f - leftTextViewWidth * 2 - spaceViewWidth * 4) / 4);
         animTextView.setTranslationY(animBaseHeight + DensityUtil.sp2px(this, TEXTSIZE * 4 + 70));
         animTextView.animate().alpha(1.0f).scaleX(1.0f).scaleY(1.0f)
                 .setInterpolator(new OvershootInterpolator())
@@ -559,7 +573,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
         final int[] m = {0, 0};
         for (final TextView animTextView : fifthList) {
             animTextView.animate().alpha(0.1f)
-                    .translationX(leftTextViewX + leftTextViewWidth / 2 - DensityUtil.sp2px(this, TEXTSIZE - 20))
+                    .translationX(leftFrameX + leftTextViewX + leftTextViewWidth / 2 - DensityUtil.sp2px(this, TEXTSIZE - 20))
                     .translationY(animBaseHeight / 2)
                     .setDuration(400)
                     .setInterpolator(new DecelerateInterpolator())
@@ -711,12 +725,14 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
                             animView.removeView(animTextView);
                             m[1]++;
                             if (m[0] == m[1]) {
+                                showResult();
                                 firstList.clear();
                                 once = 0;
                                 setNextClickable(true);
                                 setRefreshClickable(true);
                                 minus1EditText.setEnabled(true);
                                 minus2EditText.setEnabled(true);
+                                result.setEnabled(true);
                                 animBase.setEnabled(true);
                                 dismissOption();
                             }
@@ -732,6 +748,18 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
 
                         }
                     }).start();
+        }
+    }
+
+    private void showResult() {
+        Editable resultText = result.getText();
+        if (TextUtils.isEmpty(resultText)) {
+            return;
+        }
+        if (Integer.parseInt(resultText.toString()) == Integer.parseInt(leftTextView.getText().toString())) {
+            showCorrectView();
+        } else {
+            showErrorView();
         }
     }
 
@@ -754,6 +782,9 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
         minus2EditText.setText("");
         minus2EditText.clearFocus();
         minus2EditText.clearComposingText();
+        result.setText("");
+        result.clearFocus();
+        result.clearComposingText();
     }
 
     @Override
@@ -765,6 +796,7 @@ public class MinusLargeActivity extends BaseActivity implements View.OnClickList
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         minus1EditText.setText("");
         minus2EditText.setText("");
+        result.setText("");
         leftTextView.setText("");
         return false;
     }
