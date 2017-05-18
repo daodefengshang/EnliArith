@@ -1,33 +1,48 @@
 package com.szh.enliarith.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.szh.enliarith.R;
 import com.szh.enliarith.listener.ShakeListener;
 import com.szh.enliarith.utils.ChildViewHelper;
+import com.szh.enliarith.utils.Contants;
 import com.szh.enliarith.utils.DensityUtil;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
+
+import static android.Manifest.permission.BODY_SENSORS;
 
 /**
  * Created by szh on 2017/4/26.珠算
  */
 public class AbacusActivity extends AppCompatActivity implements ShakeListener.OnShakeListener {
+
+    private static final int REQUEST_BODY_SENSORS = 0;
 
     private final Handler mHideHandler = new Handler();
 
@@ -35,6 +50,10 @@ public class AbacusActivity extends AppCompatActivity implements ShakeListener.O
         @Override
         public void run() {
             fullScreen();
+            soundBox.setHeight(soundBox.getWidth());
+            soundBoxWidth = soundBox.getWidth() + 2;
+            soundBoxHeight = soundBox.getWidth();
+            soundBox.setTranslationX(-soundBoxWidth);
             mHideHandler.postDelayed(mBorderAndSetBeadRunnable, 200);
         }
     };
@@ -42,11 +61,16 @@ public class AbacusActivity extends AppCompatActivity implements ShakeListener.O
     private final Runnable mBorderAndSetBeadRunnable = new Runnable() {
         @Override
         public void run() {
+            soundBox.setTranslationY((((View)(soundBox.getParent())).getHeight() - soundBoxHeight) / 2);
             getBorderAndSetBead(view.getWidth(), view.getHeight());
         }
     };
     private SoundPool soundPool;
     private Map<Integer, Integer> soundMap;
+    private AlertDialog alertDialog;
+    private CheckBox soundBox;
+    private int soundBoxWidth;
+    private int soundBoxHeight;
 
     private void getBorderAndSetBead(int width, int height) {
         if (width * 364 < height * 756) {
@@ -93,18 +117,24 @@ public class AbacusActivity extends AppCompatActivity implements ShakeListener.O
     private FrameLayout beadView;
     private GestureDetector gestureDetector;
 
+    private SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_abacus);
         view = findViewById(R.id.image_view);
         beadView = (FrameLayout) findViewById(R.id.frame_bead);
+        soundBox = (CheckBox) findViewById(R.id.sound_checkbox);
+        sharedPreferences = getSharedPreferences(Contants.SPNAME, AppCompatActivity.MODE_PRIVATE);
+        boolean isSound = sharedPreferences.getBoolean(Contants.ISSOUND, true);
+        soundBox.setChecked(isSound);
         //noinspection deprecation
         soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
         soundMap = new HashMap<>();
         soundMap.put(0, soundPool.load(this, R.raw.bead01, 1));
         soundMap.put(1, soundPool.load(this, R.raw.bead02, 1));
-        shakeListener = new ShakeListener(this);
+        getShakeListenerInstance();
         hide();
         gestureDetector = new GestureDetector(this, new OnGestureListener());
         beadView.setOnTouchListener(new View.OnTouchListener() {
@@ -114,16 +144,104 @@ public class AbacusActivity extends AppCompatActivity implements ShakeListener.O
                 return true;
             }
         });
+        soundBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(Contants.ISSOUND, isChecked);
+                editor.apply();
+                soundBoxAnimator();
+            }
+        });
+    }
+
+    private void soundBoxAnimator() {
+        soundBox.animate().translationX(-soundBoxWidth).setDuration(300)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        soundBox.setClickable(false);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        soundBox.setClickable(true);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        soundBox.setClickable(true);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).start();
     }
 
     private void hide() {
         mHideHandler.post(mHidePart2Runnable);
     }
 
+    private void getShakeListenerInstance() {
+        if (!mayRequestContacts()) {
+            return;
+        }
+        shakeListener = new ShakeListener(this);
+    }
+
+    private boolean mayRequestContacts() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        if (checkSelfPermission(BODY_SENSORS) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        if (shouldShowRequestPermissionRationale(BODY_SENSORS)) {
+            alertDialog = new AlertDialog.Builder(this)
+                    .setCancelable(true)
+                    .setTitle(R.string.abacus_prompt)
+                    .setMessage(getResources().getText(R.string.abacus_revail))
+                    .setPositiveButton(R.string.abacus_sure, new DialogInterface.OnClickListener() {
+                        @Override
+                        @TargetApi(Build.VERSION_CODES.M)
+                        public void onClick(DialogInterface dialog, int which) {
+                            requestPermissions(new String[]{BODY_SENSORS}, REQUEST_BODY_SENSORS);
+                        }
+                    })
+                    .setNegativeButton(R.string.abacus_cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            alertDialog.dismiss();
+                        }
+                    })
+                    .show();
+        } else {
+            requestPermissions(new String[]{BODY_SENSORS}, REQUEST_BODY_SENSORS);
+        }
+        return false;
+    }
+
+    /**
+     * Callback received when a permissions request has been completed.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_BODY_SENSORS) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getShakeListenerInstance();
+            }
+        }
+    }
+
     @Override
     public void onShake() {
-        soundPool.play(soundMap.get(0), 1.0f, 1.0f, 1, 0, 1.5f);
-        soundPool.play(soundMap.get(1), 1.0f, 1.0f, 1, 0, 1.5f);
+        if (soundBox.isChecked()) {
+            soundPool.play(soundMap.get(0), 1.0f, 1.0f, 1, 0, 1.5f);
+            soundPool.play(soundMap.get(1), 1.0f, 1.0f, 1, 0, 1.5f);
+        }
         resumeBeads();
     }
 
@@ -296,6 +414,18 @@ public class AbacusActivity extends AppCompatActivity implements ShakeListener.O
                 }catch (Exception e) {
                     e.printStackTrace();
                 }
+            } else {
+                if (soundBox.isClickable() && e1.getX() < DensityUtil.dip2px(AbacusActivity.this, 30) ) {
+                    float translateX = -soundBoxWidth + e2.getX() - e1.getX();
+                    if (translateX < -soundBoxWidth) {
+                        translateX = -soundBoxWidth;
+                    } else if (translateX > view.getWidth() - soundBoxWidth) {
+                        translateX = view.getWidth() - soundBoxWidth;
+                    }
+                    if (soundBox.getTranslationX() < translateX) {
+                        soundBox.setTranslationX(translateX);
+                    }
+                }
             }
             return false;
         }
@@ -313,7 +443,8 @@ public class AbacusActivity extends AppCompatActivity implements ShakeListener.O
                     locationY1 = yBorders[2] + (childViewIndex % 7 - 2) * (beadHeight - 1);
                 }
                 if (Math.abs(view.getTranslationY() - locationY0) > 1
-                        && Math.abs(view.getTranslationY() - locationY1) > 1) {
+                        && Math.abs(view.getTranslationY() - locationY1) > 1
+                        && soundBox.isChecked()) {
                     soundPool.play(soundMap.get(1), 1.0f, 1.0f, 1, 0, 1.5f);
                 }
                 try {
